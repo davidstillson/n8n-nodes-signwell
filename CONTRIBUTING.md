@@ -7,7 +7,6 @@ Thank you for your interest in contributing to the SignWell n8n integration! Thi
 ### Prerequisites
 
 - Node.js 18.10 or higher
-- pnpm 8.1 or higher
 - n8n instance for testing
 
 ### Setup
@@ -20,12 +19,12 @@ cd n8n-nodes-signwell
 
 2. Install dependencies:
 ```bash
-pnpm install
+npm install
 ```
 
 3. Build the project:
 ```bash
-pnpm build
+npm build
 ```
 
 4. Link to your n8n instance for testing:
@@ -48,13 +47,13 @@ git checkout -b feature/your-feature-name
 3. Test your changes thoroughly
 4. Run linting and formatting:
 ```bash
-pnpm lint
-pnpm format
+npm lint
+npm format
 ```
 
 5. Build the project:
 ```bash
-pnpm build
+npm build
 ```
 
 ### Testing
