@@ -1,0 +1,68 @@
+import {
+	IExecuteFunctions,
+	ILoadOptionsFunctions,
+	IDataObject,
+	IHttpRequestMethods,
+	IRequestOptions,
+	NodeApiError,
+} from 'n8n-workflow';
+
+export async function signWellApiRequest(
+	this: IExecuteFunctions | ILoadOptionsFunctions,
+	method: IHttpRequestMethods,
+	resource: string,
+	body: any = {},
+	qs: IDataObject = {},
+	uri?: string,
+	headers: IDataObject = {},
+): Promise<any> {
+	const credentials = await this.getCredentials('signWellApi');
+
+	const options: IRequestOptions = {
+		method,
+		body,
+		qs,
+		uri: uri || `${credentials.baseUrl}${resource}`,
+		headers: {
+			'X-Api-Key': credentials.apiKey,
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			...headers,
+		},
+		json: true,
+	};
+
+	try {
+		if (Object.keys(body as IDataObject).length === 0) {
+			delete options.body;
+		}
+
+		const response = await this.helpers.request(options);
+		return response;
+	} catch (error) {
+		throw new NodeApiError(this.getNode(), error as any);
+	}
+}
+
+export async function signWellApiRequestAllItems(
+	this: IExecuteFunctions | ILoadOptionsFunctions,
+	propertyName: string,
+	method: IHttpRequestMethods,
+	endpoint: string,
+	body: any = {},
+	query: IDataObject = {},
+): Promise<any> {
+	const returnData: IDataObject[] = [];
+
+	let responseData;
+	query.page = 1;
+	query.per_page = 100;
+
+	do {
+		responseData = await signWellApiRequest.call(this, method, endpoint, body, query);
+		query.page++;
+		returnData.push.apply(returnData, responseData[propertyName] as IDataObject[]);
+	} while (responseData[propertyName] && responseData[propertyName].length !== 0);
+
+	return returnData;
+}

@@ -1,0 +1,133 @@
+{
+  "name": "RV Rental Agreement Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rental-booking-approved",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Booking Approved Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "operation": "createFromTemplate",
+        "templateId": "={{ $json.template_id }}",
+        "draft": false,
+        "testMode": false,
+        "recipients": {
+          "recipient": [
+            {
+              "name": "={{ $json.customer_name }}",
+              "email": "={{ $json.customer_email }}",
+              "role": "signer"
+            }
+          ]
+        },
+        "templateVariables": "={{ JSON.stringify({\n  \"customer_name\": $json.customer_name,\n  \"customer_email\": $json.customer_email,\n  \"rental_start_date\": $json.start_date,\n  \"rental_end_date\": $json.end_date,\n  \"rv_model\": $json.rv_details.model,\n  \"total_amount\": $json.total_amount,\n  \"security_deposit\": $json.security_deposit\n}) }}"
+      },
+      "id": "create-rental-agreement",
+      "name": "Create Rental Agreement",
+      "type": "n8n-nodes-signwell.signWellDocuments",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "signWellApi": {
+          "id": "signwell-api-credentials",
+          "name": "SignWell API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"reservation_id\": $('Booking Approved Webhook').item.json.reservation_id,\n  \"document_id\": $json.id,\n  \"document_status\": \"sent_for_signing\",\n  \"signing_url\": $json.signing_url,\n  \"created_at\": $json.created_at\n}) }}",
+        "options": {}
+      },
+      "id": "update-laravel",
+      "name": "Update Laravel Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@bestillrvrentals.com",
+        "toEmail": "={{ $('Booking Approved Webhook').item.json.customer_email }}",
+        "subject": "Your RV Rental Agreement is Ready for Signing",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>RV Rental Agreement Ready</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333;\">\n    <div style=\"max-width: 600px; margin: 0 auto; padding: 20px;\">\n        <h2 style=\"color: #2563EB;\">Your RV Rental Agreement is Ready!</h2>\n        \n        <p>Hi {{ $('Booking Approved Webhook').item.json.customer_name }},</p>\n        \n        <p>Great news! Your RV rental booking has been approved and your rental agreement is ready for signing.</p>\n        \n        <div style=\"background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;\">\n            <h3 style=\"margin-top: 0;\">Rental Details:</h3>\n            <ul>\n                <li><strong>RV Model:</strong> {{ $('Booking Approved Webhook').item.json.rv_details.model }}</li>\n                <li><strong>Rental Dates:</strong> {{ $('Booking Approved Webhook').item.json.start_date }} to {{ $('Booking Approved Webhook').item.json.end_date }}</li>\n                <li><strong>Total Amount:</strong> {{ $('Booking Approved Webhook').item.json.total_amount }}</li>\n            </ul>\n        </div>\n        \n        <p><strong>Next Steps:</strong></p>\n        <ol>\n            <li>Click the link below to review and sign your rental agreement</li>\n            <li>Complete the signing process electronically</li>\n            <li>You'll receive a copy of the signed agreement via email</li>\n        </ol>\n        \n        <div style=\"text-align: center; margin: 30px 0;\">\n            <a href=\"{{ $('Create Rental Agreement').item.json.signing_url }}\" \n               style=\"background-color: #2563EB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;\">\n                📝 Sign Rental Agreement\n            </a>\n        </div>\n        \n        <p><small>This link will expire in 30 days. If you have any questions, please contact us at support@bestillrvrentals.com</small></p>\n        \n        <p>Thank you for choosing Be Still RV Rentals!</p>\n        \n        <p>Best regards,<br>\n        The Be Still RV Rentals Team</p>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-customer-email",
+      "name": "Send Customer Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "content": "## RV Rental Agreement Workflow Complete\n\n**Reservation ID:** {{ $('Booking Approved Webhook').item.json.reservation_id }}\n**Customer:** {{ $('Booking Approved Webhook').item.json.customer_name }}\n**Document ID:** {{ $('Create Rental Agreement').item.json.id }}\n**Status:** Agreement sent for signing\n\n**Next Steps:**\n- Customer will receive signing link via email\n- Monitor document completion via SignWell webhooks\n- Process payment after agreement is signed",
+        "height": 80,
+        "width": 80
+      },
+      "id": "workflow-complete",
+      "name": "Workflow Complete",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Booking Approved Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create Rental Agreement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Rental Agreement": {
+      "main": [
+        [
+          {
+            "node": "Update Laravel Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Laravel Database": {
+      "main": [
+        [
+          {
+            "node": "Send Customer Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}

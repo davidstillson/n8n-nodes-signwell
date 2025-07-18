@@ -1,0 +1,23 @@
+# Source files
+credentials/
+nodes/
+*.ts
+tsconfig.json
+.eslintrc.js
+gulpfile.js
+
+# Development files
+.git/
+.github/
+node_modules/
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Documentation (keep README.md)
+CONTRIBUTING.md
+examples/
+
+# Build artifacts (keep dist/)
+!dist/

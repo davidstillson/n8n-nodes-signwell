@@ -1,0 +1,51 @@
+{
+  "name": "n8n-nodes-signwell",
+  "version": "1.0.0",
+  "description": "n8n node for SignWell API integration - document signing and template management",
+  "keywords": [
+    "n8n-community-node-package",
+    "signwell",
+    "esignature",
+    "document-signing",
+    "templates"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/your-username/n8n-nodes-signwell",
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/n8n-nodes-signwell.git"
+  },
+  "engines": {
+    "node": ">=18.10"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc && cp nodes/**/*.svg dist/nodes/SignWell/ 2>/dev/null || true",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/SignWellApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/SignWell/SignWellDocuments.node.js",
+      "dist/nodes/SignWell/SignWellTemplates.node.js"
+    ]
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "n8n-workflow": "^1.0.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "^1.0.0"
+  }
+}
