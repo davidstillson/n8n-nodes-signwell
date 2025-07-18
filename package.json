@@ -10,14 +10,14 @@
     "templates"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/your-username/n8n-nodes-signwell",
+  "homepage": "https://github.com/davidstillson/n8n-nodes-signwell",
   "author": {
     "name": "Your Name",
     "email": "your.email@example.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/n8n-nodes-signwell.git"
+    "url": "git+https://github.com/davidstillson/n8n-nodes-signwell.git"
   },
   "engines": {
     "node": ">=18.10"

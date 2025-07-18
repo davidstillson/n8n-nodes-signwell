@@ -24,7 +24,7 @@ To install the node locally for development:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/n8n-nodes-signwell.git
+git clone https://github.com/davidstillson/n8n-nodes-signwell.git
 cd n8n-nodes-signwell
 
 # Install dependencies
@@ -200,7 +200,7 @@ The nodes automatically handle rate limiting with appropriate error messages.
 
 - [SignWell API Documentation](https://developers.signwell.com/)
 - [n8n Community Forum](https://community.n8n.io/)
-- [GitHub Issues](https://github.com/your-username/n8n-nodes-signwell/issues)
+- [GitHub Issues](https://github.com/davidstillson/n8n-nodes-signwell/issues)
 
 ## Contributing
 

@@ -14,7 +14,7 @@ Thank you for your interest in contributing to the SignWell n8n integration! Thi
 
 1. Fork and clone the repository:
 ```bash
-git clone https://github.com/your-username/n8n-nodes-signwell.git
+git clone https://github.com/davidstillson/n8n-nodes-signwell.git
 cd n8n-nodes-signwell
 ```
 
