@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-signwell",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "n8n node for SignWell API integration - document signing and template management",
   "keywords": [
     "n8n-community-node-package",
@@ -37,8 +37,7 @@
       "dist/credentials/SignWellApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/SignWell/SignWellDocuments.node.js",
-      "dist/nodes/SignWell/SignWellTemplates.node.js"
+      "dist/nodes/SignWell/SignWell.node.js"
     ]
   },
   "devDependencies": {

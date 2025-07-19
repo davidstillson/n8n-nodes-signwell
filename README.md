@@ -53,19 +53,26 @@ This package includes a **SignWell API** credential type. Configure it with:
 
 ## Nodes
 
-### SignWell Documents
+### SignWell
+
+A unified node for interacting with the SignWell API, supporting both document and template operations.
+
+#### Resources
+
+The SignWell node provides two main resources:
+
+##### Documents
 
 Interact with SignWell documents for electronic signing.
 
-#### Operations
-
+**Operations:**
 - **Create From Template**: Create a new document from an existing template
 - **Get**: Retrieve document information
 - **Delete**: Delete a document
 - **Get Completed PDF**: Download the completed signed PDF
 - **Send Reminder**: Send a signing reminder to recipients
 
-#### Create From Template Example
+**Create From Template Example:**
 
 ```json
 {
@@ -87,18 +94,17 @@ Interact with SignWell documents for electronic signing.
 }
 ```
 
-### SignWell Templates
+##### Templates
 
 Manage SignWell document templates.
 
-#### Operations
-
+**Operations:**
 - **Get**: Retrieve template information
 - **Create**: Create a new template
 - **Update**: Update an existing template
 - **Delete**: Delete a template
 
-#### Create Template Example
+**Create Template Example:**
 
 ```json
 {
@@ -128,7 +134,7 @@ This package is designed to integrate with RV rental management systems. Here's 
   "nodes": [
     {
       "name": "Create Rental Agreement",
-      "type": "n8n-nodes-signwell.signWellDocuments",
+      "type": "n8n-nodes-signwell.signWell",
       "parameters": {
         "resource": "document",
         "operation": "createFromTemplate",
@@ -211,6 +217,13 @@ Contributions are welcome! Please read the contributing guidelines and submit pu
 [MIT](LICENSE.md)
 
 ## Changelog
+
+### 1.1.0
+- **BREAKING CHANGE**: Combined SignWell Documents and Templates into a single unified SignWell node
+- Improved user experience with resource-based operation selection (Document/Template)
+- Maintained all existing functionality from both previous nodes
+- Updated documentation to reflect new combined node structure
+- Cleaner package structure with single node registration
 
 ### 1.0.0
 - Initial release

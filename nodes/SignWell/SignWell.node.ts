@@ -9,17 +9,17 @@ import {
 
 import { signWellApiRequest } from './GenericFunctions';
 
-export class SignWellDocuments implements INodeType {
+export class SignWell implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'SignWell Documents',
-		name: 'signWellDocuments',
+		displayName: 'SignWell',
+		name: 'signWell',
 		icon: 'file:signwell.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Interact with SignWell Documents API',
+		description: 'Interact with SignWell API for documents and templates',
 		defaults: {
-			name: 'SignWell Documents',
+			name: 'SignWell',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
@@ -39,10 +39,18 @@ export class SignWellDocuments implements INodeType {
 					{
 						name: 'Document',
 						value: 'document',
+						description: 'Work with SignWell documents',
+					},
+					{
+						name: 'Template',
+						value: 'template',
+						description: 'Work with SignWell templates',
 					},
 				],
 				default: 'document',
 			},
+
+			// Document Operations
 			{
 				displayName: 'Operation',
 				name: 'operation',
@@ -88,7 +96,47 @@ export class SignWellDocuments implements INodeType {
 				default: 'createFromTemplate',
 			},
 
-			// Create From Template parameters
+			// Template Operations
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['template'],
+					},
+				},
+				options: [
+					{
+						name: 'Get',
+						value: 'get',
+						description: 'Get a template',
+						action: 'Get a template',
+					},
+					{
+						name: 'Create',
+						value: 'create',
+						description: 'Create a new template',
+						action: 'Create a template',
+					},
+					{
+						name: 'Update',
+						value: 'update',
+						description: 'Update a template',
+						action: 'Update a template',
+					},
+					{
+						name: 'Delete',
+						value: 'delete',
+						description: 'Delete a template',
+						action: 'Delete a template',
+					},
+				],
+				default: 'get',
+			},
+
+			// Document Parameters - Create From Template
 			{
 				displayName: 'Template ID',
 				name: 'templateId',
@@ -174,8 +222,8 @@ export class SignWellDocuments implements INodeType {
 										value: 'signer',
 									},
 									{
-										name: 'CC',
-										value: 'cc',
+										name: 'Viewer',
+										value: 'viewer',
 									},
 								],
 								default: 'signer',
@@ -184,6 +232,7 @@ export class SignWellDocuments implements INodeType {
 						],
 					},
 				],
+				description: 'Recipients who will receive the document for signing',
 			},
 			{
 				displayName: 'Template Variables',
@@ -199,7 +248,7 @@ export class SignWellDocuments implements INodeType {
 				description: 'Template variables to populate in the document as JSON object',
 			},
 
-			// Get, Delete, Get Completed PDF, Send Reminder parameters
+			// Document Parameters - Get, Delete, Get Completed PDF, Send Reminder
 			{
 				displayName: 'Document ID',
 				name: 'documentId',
@@ -215,7 +264,7 @@ export class SignWellDocuments implements INodeType {
 				description: 'The ID of the document',
 			},
 
-			// Send Reminder specific parameters
+			// Document Parameters - Send Reminder specific
 			{
 				displayName: 'Recipient Email',
 				name: 'recipientEmail',
@@ -229,6 +278,119 @@ export class SignWellDocuments implements INodeType {
 				},
 				default: '',
 				description: 'The email address of the recipient to send the reminder to',
+			},
+
+			// Template Parameters - Get, Update, Delete
+			{
+				displayName: 'Template ID',
+				name: 'templateId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['template'],
+						operation: ['get', 'update', 'delete'],
+					},
+				},
+				default: '',
+				description: 'The ID of the template',
+			},
+
+			// Template Parameters - Create
+			{
+				displayName: 'Template Name',
+				name: 'templateName',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['template'],
+						operation: ['create'],
+					},
+				},
+				default: '',
+				description: 'The name of the template',
+			},
+			{
+				displayName: 'File Data',
+				name: 'fileData',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['template'],
+						operation: ['create'],
+					},
+				},
+				default: '',
+				description: 'Base64 encoded file data for the template document',
+			},
+			{
+				displayName: 'File Name',
+				name: 'fileName',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['template'],
+						operation: ['create'],
+					},
+				},
+				default: '',
+				description: 'The file name (e.g., "contract-template.pdf")',
+			},
+
+			// Template Parameters - Update
+			{
+				displayName: 'Update Fields',
+				name: 'updateFields',
+				type: 'collection',
+				placeholder: 'Add Field',
+				default: {},
+				displayOptions: {
+					show: {
+						resource: ['template'],
+						operation: ['update'],
+					},
+				},
+				options: [
+					{
+						displayName: 'Template Name',
+						name: 'templateName',
+						type: 'string',
+						default: '',
+						description: 'The new name for the template',
+					},
+					{
+						displayName: 'File Data',
+						name: 'fileData',
+						type: 'string',
+						default: '',
+						description: 'Base64 encoded file data to replace the template document',
+					},
+					{
+						displayName: 'File Name',
+						name: 'fileName',
+						type: 'string',
+						default: '',
+						description: 'The new file name (e.g., "updated-contract.pdf")',
+					},
+				],
+			},
+
+			// Template Parameters - Test Mode for Create/Update
+			{
+				displayName: 'Test Mode',
+				name: 'testMode',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						resource: ['template'],
+						operation: ['create', 'update'],
+					},
+				},
+				default: false,
+				description: 'Whether to create/update the template in test mode',
 			},
 		],
 	};
@@ -245,6 +407,7 @@ export class SignWellDocuments implements INodeType {
 
 		for (let i = 0; i < length; i++) {
 			try {
+				// Document operations
 				if (resource === 'document') {
 					if (operation === 'createFromTemplate') {
 						// Create Document From Template operation
@@ -320,6 +483,74 @@ export class SignWellDocuments implements INodeType {
 							'POST',
 							`/documents/${documentId}/remind`,
 							body,
+						);
+					}
+				}
+
+				// Template operations
+				if (resource === 'template') {
+					if (operation === 'get') {
+						// Get Template operation
+						const templateId = this.getNodeParameter('templateId', i) as string;
+
+						responseData = await signWellApiRequest.call(
+							this,
+							'GET',
+							`/document_templates/${templateId}`,
+						);
+					} else if (operation === 'create') {
+						// Create Template operation
+						const templateName = this.getNodeParameter('templateName', i) as string;
+						const fileData = this.getNodeParameter('fileData', i) as string;
+						const fileName = this.getNodeParameter('fileName', i) as string;
+						const testMode = this.getNodeParameter('testMode', i, false) as boolean;
+
+						const body: any = {
+							name: templateName,
+							file: fileData,
+							filename: fileName,
+						};
+
+						if (testMode) {
+							body.test_mode = true;
+						}
+
+						responseData = await signWellApiRequest.call(this, 'POST', '/template', body);
+					} else if (operation === 'update') {
+						// Update Template operation
+						const templateId = this.getNodeParameter('templateId', i) as string;
+						const updateFields = this.getNodeParameter('updateFields', i) as any;
+						const testMode = this.getNodeParameter('testMode', i, false) as boolean;
+
+						const body: any = {};
+
+						if (updateFields.templateName) {
+							body.name = updateFields.templateName;
+						}
+						if (updateFields.fileData) {
+							body.file = updateFields.fileData;
+						}
+						if (updateFields.fileName) {
+							body.filename = updateFields.fileName;
+						}
+						if (testMode) {
+							body.test_mode = true;
+						}
+
+						responseData = await signWellApiRequest.call(
+							this,
+							'PUT',
+							`/document_templates/${templateId}`,
+							body,
+						);
+					} else if (operation === 'delete') {
+						// Delete Template operation
+						const templateId = this.getNodeParameter('templateId', i) as string;
+
+						responseData = await signWellApiRequest.call(
+							this,
+							'DELETE',
+							`/document_templates/${templateId}`,
 						);
 					}
 				}
