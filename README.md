@@ -66,7 +66,7 @@ The SignWell node provides two main resources:
 Interact with SignWell documents for electronic signing.
 
 **Operations:**
-- **Create From Template**: Create a new document from an existing template
+- **Create From Template**: Create a new document from an existing template (supports recipients, template variables, template fields, and attachment requests)
 - **Get**: Retrieve document information
 - **Delete**: Delete a document
 - **Get Completed PDF**: Download the completed signed PDF
@@ -102,14 +102,27 @@ Interact with SignWell documents for electronic signing.
       "api_id": "end_date",
       "value": "2024-01-22"
     }
+  ],
+  "attachment_requests": [
+    {
+      "name": "Driver's License",
+      "recipient_id": "recipient_1",
+      "required": true
+    },
+    {
+      "name": "Insurance Certificate",
+      "recipient_id": "recipient_1",
+      "required": false
+    }
   ]
 }
 ```
 
-**Template Variables vs Template Fields:**
+**Template Variables vs Template Fields vs Attachment Requests:**
 
 - **Template Variables**: Used for text replacement in the document content (e.g., replacing `{{customer_name}}` placeholders in the document text)
 - **Template Fields**: Used to pre-fill form fields in the document (e.g., setting values for date fields, text inputs, checkboxes, etc.)
+- **Attachment Requests**: Used to request file uploads from recipients during the signing process (e.g., driver's license, insurance certificates, etc.)
 
 ##### Templates
 
@@ -178,6 +191,20 @@ This package is designed to integrate with RV rental management systems. Here's 
             {
               "api_id": "end_date",
               "value": "{{ $json.end_date }}"
+            }
+          ]
+        },
+        "attachmentRequests": {
+          "attachmentRequest": [
+            {
+              "name": "Driver's License",
+              "recipient_id": "recipient_1",
+              "required": true
+            },
+            {
+              "name": "Insurance Certificate",
+              "recipient_id": "recipient_1",
+              "required": false
             }
           ]
         }

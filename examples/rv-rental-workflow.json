@@ -48,6 +48,25 @@
               "value": "={{ $json.total_amount }}"
             }
           ]
+        },
+        "attachmentRequests": {
+          "attachmentRequest": [
+            {
+              "name": "Driver's License",
+              "recipient_id": "recipient_1",
+              "required": true
+            },
+            {
+              "name": "Insurance Certificate",
+              "recipient_id": "recipient_1",
+              "required": false
+            },
+            {
+              "name": "Credit Card Authorization",
+              "recipient_id": "recipient_1",
+              "required": true
+            }
+          ]
         }
       },
       "id": "create-rental-agreement",

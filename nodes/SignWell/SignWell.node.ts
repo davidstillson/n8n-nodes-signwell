@@ -301,6 +301,54 @@ export class SignWell implements INodeType {
 				],
 				description: 'Template fields to pre-fill in the document (different from template variables)',
 			},
+			{
+				displayName: 'Attachment Requests',
+				name: 'attachmentRequests',
+				placeholder: 'Add Attachment Request',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				displayOptions: {
+					show: {
+						resource: ['document'],
+						operation: ['createFromTemplate'],
+					},
+				},
+				default: {},
+				options: [
+					{
+						name: 'attachmentRequest',
+						displayName: 'Attachment Request',
+						values: [
+							{
+								displayName: 'Name',
+								name: 'name',
+								type: 'string',
+								required: true,
+								default: '',
+								description: 'Name of the requested attachment (e.g., "Driver\'s License", "Insurance Certificate")',
+							},
+							{
+								displayName: 'Recipient ID',
+								name: 'recipient_id',
+								type: 'string',
+								required: true,
+								default: '',
+								description: 'Unique identifier of the recipient that will view the attachment request (must match a recipient ID)',
+							},
+							{
+								displayName: 'Required',
+								name: 'required',
+								type: 'boolean',
+								default: true,
+								description: 'Whether the recipient must upload the attachment to complete/sign the document',
+							},
+						],
+					},
+				],
+				description: 'Attachments that recipients must upload to complete the signing process. Shown after all document fields have been completed.',
+			},
 
 			// Document Parameters - Get, Delete, Get Completed PDF, Send Reminder
 			{
@@ -521,6 +569,23 @@ export class SignWell implements INodeType {
 								return {
 									api_id: fieldApiId,
 									value: fieldValue,
+								};
+							});
+						}
+
+						// Add attachment requests if provided
+						const attachmentRequestsData = this.getNodeParameter('attachmentRequests', i, {}) as any;
+						if (attachmentRequestsData.attachmentRequest && attachmentRequestsData.attachmentRequest.length > 0) {
+							body.attachment_requests = attachmentRequestsData.attachmentRequest.map((_: any, requestIndex: number) => {
+								// Use getNodeParameter to properly resolve variables for each attachment request
+								const requestName = this.getNodeParameter(`attachmentRequests.attachmentRequest[${requestIndex}].name`, i) as string;
+								const recipientId = this.getNodeParameter(`attachmentRequests.attachmentRequest[${requestIndex}].recipient_id`, i) as string;
+								const required = this.getNodeParameter(`attachmentRequests.attachmentRequest[${requestIndex}].required`, i, true) as boolean;
+
+								return {
+									name: requestName,
+									recipient_id: recipientId,
+									required: required,
 								};
 							});
 						}
