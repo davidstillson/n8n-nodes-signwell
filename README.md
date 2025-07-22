@@ -81,9 +81,11 @@ Interact with SignWell documents for electronic signing.
   "test_mode": false,
   "recipients": [
     {
+      "id": "recipient_1",
       "name": "John Doe",
       "email": "john@example.com",
-      "role": "signer"
+      "role": "signer",
+      "placeholder_names": ["renter", "customer"]
     }
   ],
   "template_variables": {
@@ -143,9 +145,11 @@ This package is designed to integrate with RV rental management systems. Here's 
         "recipients": {
           "recipient": [
             {
+              "id": "recipient_1",
               "name": "{{ $json.customer_name }}",
               "email": "{{ $json.customer_email }}",
-              "role": "signer"
+              "role": "signer",
+              "placeholder_names": "renter, customer"
             }
           ]
         },
@@ -218,11 +222,20 @@ Contributions are welcome! Please read the contributing guidelines and submit pu
 
 ## Changelog
 
+### 1.1.1
+- Fixed recipients API compatibility issue with SignWell template placeholders
+- Added required `id` field for recipients
+- Added optional `placeholder_names` field for mapping recipients to template placeholders
+- Updated documentation and examples with correct recipient structure
+- Cleaned up unused imports and variables
+
 ### 1.1.0
 - **BREAKING CHANGE**: Combined SignWell Documents and Templates into a single unified SignWell node
+- **BREAKING CHANGE**: Updated recipients structure to include required `id` field and optional `placeholder_names` field
 - Improved user experience with resource-based operation selection (Document/Template)
+- Fixed recipients API compatibility issues with SignWell template placeholders
 - Maintained all existing functionality from both previous nodes
-- Updated documentation to reflect new combined node structure
+- Updated documentation to reflect new combined node structure and recipient format
 - Cleaner package structure with single node registration
 
 ### 1.0.0

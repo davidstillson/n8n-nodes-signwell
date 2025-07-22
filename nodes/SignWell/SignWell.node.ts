@@ -4,7 +4,6 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeConnectionType,
-	NodeOperationError,
 } from 'n8n-workflow';
 
 import { signWellApiRequest } from './GenericFunctions';
@@ -198,6 +197,14 @@ export class SignWell implements INodeType {
 						displayName: 'Recipient',
 						values: [
 							{
+								displayName: 'ID',
+								name: 'id',
+								type: 'string',
+								required: true,
+								default: '',
+								description: 'Unique identifier for the recipient (e.g., "recipient_1", "recipient_2")',
+							},
+							{
 								displayName: 'Name',
 								name: 'name',
 								type: 'string',
@@ -228,6 +235,13 @@ export class SignWell implements INodeType {
 								],
 								default: 'signer',
 								description: 'The role of the recipient',
+							},
+							{
+								displayName: 'Placeholder Name',
+								name: 'placeholder_name',
+								type: 'string',
+								default: '',
+								description: 'The name of the placeholder you want this recipient assigned to (e.g., "renter" or "document sender")',
 							},
 						],
 					},
@@ -399,7 +413,6 @@ export class SignWell implements INodeType {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 		const length = items.length;
-		const qs: any = {};
 		let responseData;
 
 		const resource = this.getNodeParameter('resource', 0);
@@ -427,11 +440,28 @@ export class SignWell implements INodeType {
 						// Add recipients if provided
 						const recipientsData = this.getNodeParameter('recipients', i, {}) as any;
 						if (recipientsData.recipient && recipientsData.recipient.length > 0) {
-							body.recipients = recipientsData.recipient.map((recipient: any) => ({
-								name: recipient.name,
-								email: recipient.email,
-								role: recipient.role || 'signer',
-							}));
+							body.recipients = recipientsData.recipient.map((_: any, recipientIndex: number) => {
+								// Use getNodeParameter to properly resolve variables for each recipient field
+								const recipientId = this.getNodeParameter(`recipients.recipient[${recipientIndex}].id`, i) as string;
+								const recipientName = this.getNodeParameter(`recipients.recipient[${recipientIndex}].name`, i) as string;
+								const recipientEmail = this.getNodeParameter(`recipients.recipient[${recipientIndex}].email`, i) as string;
+								const recipientRole = this.getNodeParameter(`recipients.recipient[${recipientIndex}].role`, i, 'signer') as string;
+								const placeholderName = this.getNodeParameter(`recipients.recipient[${recipientIndex}].placeholder_name`, i, '') as string;
+
+								const recipientObj: any = {
+									id: recipientId,
+									name: recipientName,
+									email: recipientEmail,
+									role: recipientRole,
+								};
+
+								// Add placeholder_name if provided
+								if (placeholderName && placeholderName.trim()) {
+									recipientObj.placeholder_name = placeholderName.trim();
+								}
+
+								return recipientObj;
+							});
 						}
 
 						// Add template variables if provided
@@ -524,14 +554,18 @@ export class SignWell implements INodeType {
 
 						const body: any = {};
 
+						// Properly resolve variables for update fields
 						if (updateFields.templateName) {
-							body.name = updateFields.templateName;
+							const templateName = this.getNodeParameter('updateFields.templateName', i) as string;
+							body.name = templateName;
 						}
 						if (updateFields.fileData) {
-							body.file = updateFields.fileData;
+							const fileData = this.getNodeParameter('updateFields.fileData', i) as string;
+							body.file = fileData;
 						}
 						if (updateFields.fileName) {
-							body.filename = updateFields.fileName;
+							const fileName = this.getNodeParameter('updateFields.fileName', i) as string;
+							body.filename = fileName;
 						}
 						if (testMode) {
 							body.test_mode = true;

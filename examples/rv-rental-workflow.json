@@ -24,9 +24,11 @@
         "recipients": {
           "recipient": [
             {
+              "id": "recipient_1",
               "name": "={{ $json.customer_name }}",
               "email": "={{ $json.customer_email }}",
-              "role": "signer"
+              "role": "signer",
+              "placeholder_names": "renter, customer"
             }
           ]
         },
@@ -34,7 +36,7 @@
       },
       "id": "create-rental-agreement",
       "name": "Create Rental Agreement",
-      "type": "n8n-nodes-signwell.signWellDocuments",
+      "type": "n8n-nodes-signwell.signWell",
       "typeVersion": 1,
       "position": [460, 300],
       "credentials": {
