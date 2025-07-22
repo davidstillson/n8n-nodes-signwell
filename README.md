@@ -92,9 +92,24 @@ Interact with SignWell documents for electronic signing.
     "customer_name": "John Doe",
     "rental_dates": "2024-01-15 to 2024-01-22",
     "total_amount": "$1,250.00"
-  }
+  },
+  "template_fields": [
+    {
+      "api_id": "start_date",
+      "value": "2024-01-15"
+    },
+    {
+      "api_id": "end_date",
+      "value": "2024-01-22"
+    }
+  ]
 }
 ```
+
+**Template Variables vs Template Fields:**
+
+- **Template Variables**: Used for text replacement in the document content (e.g., replacing `{{customer_name}}` placeholders in the document text)
+- **Template Fields**: Used to pre-fill form fields in the document (e.g., setting values for date fields, text inputs, checkboxes, etc.)
 
 ##### Templates
 
@@ -153,7 +168,19 @@ This package is designed to integrate with RV rental management systems. Here's 
             }
           ]
         },
-        "templateVariables": "{{ JSON.stringify($json.rental_details) }}"
+        "templateVariables": "{{ JSON.stringify($json.rental_details) }}",
+        "templateFields": {
+          "field": [
+            {
+              "api_id": "start_date",
+              "value": "{{ $json.start_date }}"
+            },
+            {
+              "api_id": "end_date",
+              "value": "{{ $json.end_date }}"
+            }
+          ]
+        }
       }
     }
   ]

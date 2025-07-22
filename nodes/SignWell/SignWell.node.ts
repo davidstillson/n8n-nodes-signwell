@@ -261,6 +261,46 @@ export class SignWell implements INodeType {
 				default: '{}',
 				description: 'Template variables to populate in the document as JSON object',
 			},
+			{
+				displayName: 'Template Fields',
+				name: 'templateFields',
+				placeholder: 'Add Field',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+				},
+				displayOptions: {
+					show: {
+						resource: ['document'],
+						operation: ['createFromTemplate'],
+					},
+				},
+				default: {},
+				options: [
+					{
+						name: 'field',
+						displayName: 'Field',
+						values: [
+							{
+								displayName: 'Field ID',
+								name: 'api_id',
+								type: 'string',
+								required: true,
+								default: '',
+								description: 'The API ID of the field to pre-fill (e.g., "start_date", "end_date")',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								description: 'The value to pre-fill in the field',
+							},
+						],
+					},
+				],
+				description: 'Template fields to pre-fill in the document (different from template variables)',
+			},
 
 			// Document Parameters - Get, Delete, Get Completed PDF, Send Reminder
 			{
@@ -468,6 +508,21 @@ export class SignWell implements INodeType {
 						const templateVariables = this.getNodeParameter('templateVariables', i, {}) as object;
 						if (Object.keys(templateVariables).length > 0) {
 							body.template_variables = templateVariables;
+						}
+
+						// Add template fields if provided
+						const templateFieldsData = this.getNodeParameter('templateFields', i, {}) as any;
+						if (templateFieldsData.field && templateFieldsData.field.length > 0) {
+							body.template_fields = templateFieldsData.field.map((_: any, fieldIndex: number) => {
+								// Use getNodeParameter to properly resolve variables for each field
+								const fieldApiId = this.getNodeParameter(`templateFields.field[${fieldIndex}].api_id`, i) as string;
+								const fieldValue = this.getNodeParameter(`templateFields.field[${fieldIndex}].value`, i) as string;
+
+								return {
+									api_id: fieldApiId,
+									value: fieldValue,
+								};
+							});
 						}
 
 						responseData = await signWellApiRequest.call(

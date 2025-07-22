@@ -32,7 +32,23 @@
             }
           ]
         },
-        "templateVariables": "={{ JSON.stringify({\n  \"customer_name\": $json.customer_name,\n  \"customer_email\": $json.customer_email,\n  \"rental_start_date\": $json.start_date,\n  \"rental_end_date\": $json.end_date,\n  \"rv_model\": $json.rv_details.model,\n  \"total_amount\": $json.total_amount,\n  \"security_deposit\": $json.security_deposit\n}) }}"
+        "templateVariables": "={{ JSON.stringify({\n  \"customer_name\": $json.customer_name,\n  \"customer_email\": $json.customer_email,\n  \"rental_start_date\": $json.start_date,\n  \"rental_end_date\": $json.end_date,\n  \"rv_model\": $json.rv_details.model,\n  \"total_amount\": $json.total_amount,\n  \"security_deposit\": $json.security_deposit\n}) }}",
+        "templateFields": {
+          "field": [
+            {
+              "api_id": "start_date",
+              "value": "={{ $json.start_date }}"
+            },
+            {
+              "api_id": "end_date",
+              "value": "={{ $json.end_date }}"
+            },
+            {
+              "api_id": "total_amount",
+              "value": "={{ $json.total_amount }}"
+            }
+          ]
+        }
       },
       "id": "create-rental-agreement",
       "name": "Create Rental Agreement",
