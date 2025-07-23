@@ -6,6 +6,22 @@ This is an n8n community node package that provides integration with the [SignWe
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
+## 🆕 What's New in v1.3.1
+
+### ✨ Attachment Requests Support
+Request file uploads from recipients during the signing process! Perfect for:
+- **Driver's License** verification
+- **Insurance Certificates**
+- **Credit Card Authorization** forms
+- **Identity Documents** and more
+
+### 🎯 Complete SignWell Integration
+Now supports **all major SignWell features**:
+- ✅ **Recipients** - Multiple signers with role assignment
+- ✅ **Template Variables** - Dynamic text replacement
+- ✅ **Template Fields** - Pre-fill form fields
+- ✅ **Attachment Requests** - File upload requirements
+
 ## Installation
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
@@ -120,6 +136,13 @@ Interact with SignWell documents for electronic signing.
 
 **Template Variables vs Template Fields vs Attachment Requests:**
 
+| Feature | Purpose | Example Use Case |
+|---------|---------|------------------|
+| **Template Variables** | Text replacement in document content | Replace `{{customer_name}}` with "John Doe" |
+| **Template Fields** | Pre-fill form fields | Set date field values, checkbox states |
+| **Attachment Requests** | Request file uploads from recipients | Require driver's license, insurance docs |
+
+**Detailed Explanations:**
 - **Template Variables**: Used for text replacement in the document content (e.g., replacing `{{customer_name}}` placeholders in the document text)
 - **Template Fields**: Used to pre-fill form fields in the document (e.g., setting values for date fields, text inputs, checkboxes, etc.)
 - **Attachment Requests**: Used to request file uploads from recipients during the signing process (e.g., driver's license, insurance certificates, etc.)
@@ -276,26 +299,59 @@ Contributions are welcome! Please read the contributing guidelines and submit pu
 
 ## Changelog
 
-### 1.1.1
-- Fixed recipients API compatibility issue with SignWell template placeholders
-- Added required `id` field for recipients
-- Added optional `placeholder_names` field for mapping recipients to template placeholders
-- Updated documentation and examples with correct recipient structure
-- Cleaned up unused imports and variables
+### 1.3.1 - 2024-07-23
+- 📚 **Documentation**: Comprehensive README and changelog updates
+- 📚 **Documentation**: Added "What's New" section highlighting latest features
+- 📚 **Documentation**: Enhanced feature comparison table and examples
+- 📚 **Documentation**: Improved version history and migration guidance
 
-### 1.1.0
-- **BREAKING CHANGE**: Combined SignWell Documents and Templates into a single unified SignWell node
-- **BREAKING CHANGE**: Updated recipients structure to include required `id` field and optional `placeholder_names` field
-- Improved user experience with resource-based operation selection (Document/Template)
-- Fixed recipients API compatibility issues with SignWell template placeholders
-- Maintained all existing functionality from both previous nodes
-- Updated documentation to reflect new combined node structure and recipient format
-- Cleaner package structure with single node registration
+### 1.3.0 - 2024-07-23
+- ✨ **NEW FEATURE**: Added **Attachment Requests** support for document creation
+  - Recipients can now be required to upload files during the signing process
+  - Configurable attachment names (e.g., "Driver's License", "Insurance Certificate")
+  - Per-recipient attachment assignment via `recipient_id` matching
+  - Optional/required attachment settings with `required` boolean flag
+  - Attachments shown after all document fields are completed
+- 📚 **Documentation**: Updated README with attachment requests examples and usage
+- 📚 **Documentation**: Enhanced API structure examples with all supported features
+- 🧪 **Testing**: Updated test files to include attachment requests validation
+- 📦 **Examples**: Updated workflow examples to demonstrate attachment requests usage
 
-### 1.0.0
-- Initial release
-- SignWell Documents node with all major operations
-- SignWell Templates node with CRUD operations
-- Comprehensive error handling and validation
-- Test mode support
-- Rate limiting awareness
+### 1.2.0 - 2024-07-22
+- ✨ **NEW FEATURE**: Added **Template Fields** support for pre-filling form fields
+  - Pre-fill date fields, text inputs, checkboxes, and other form elements
+  - Separate from template variables - used for actual form field values
+  - Support for `api_id` and `value` field mapping
+  - Full n8n variable expression support for dynamic field values
+- 🔧 **API Compatibility**: Fixed recipients structure to use `placeholder_name` (singular) instead of `placeholder_names` (plural)
+  - Aligns with SignWell API specification
+  - Each recipient now has single placeholder assignment
+- 📚 **Documentation**: Added clear distinction between Template Variables vs Template Fields vs Attachment Requests
+- 📚 **Documentation**: Updated examples to show proper usage of all features
+- 🧪 **Testing**: Added template fields testing and validation
+
+### 1.1.1 - 2024-07-20
+- 🐛 **Bug Fix**: Fixed recipients API compatibility issue with SignWell template placeholders
+- ✨ **Enhancement**: Added required `id` field for recipients for proper API compliance
+- ✨ **Enhancement**: Added optional `placeholder_name` field for mapping recipients to template placeholders
+- 📚 **Documentation**: Updated documentation and examples with correct recipient structure
+- 🧹 **Code Quality**: Cleaned up unused imports and variables
+
+### 1.1.0 - 2024-07-15
+- 🔄 **BREAKING CHANGE**: Combined SignWell Documents and Templates into a single unified SignWell node
+- 🔄 **BREAKING CHANGE**: Updated recipients structure to include required `id` field and optional `placeholder_name` field
+- ✨ **Enhancement**: Improved user experience with resource-based operation selection (Document/Template)
+- 🐛 **Bug Fix**: Fixed recipients API compatibility issues with SignWell template placeholders
+- ✅ **Compatibility**: Maintained all existing functionality from both previous nodes
+- 📚 **Documentation**: Updated documentation to reflect new combined node structure and recipient format
+- 🏗️ **Architecture**: Cleaner package structure with single node registration
+
+### 1.0.0 - 2024-07-01
+- 🎉 **Initial Release**: Complete SignWell API integration for n8n
+- 📄 **Documents**: Full document lifecycle management (create, get, delete, PDF download, reminders)
+- 📋 **Templates**: Complete template CRUD operations (create, read, update, delete)
+- 🔐 **Authentication**: SignWell API credentials with API key authentication
+- 🛡️ **Error Handling**: Comprehensive error handling and validation
+- 🧪 **Test Mode**: Full test mode support for development and testing
+- ⚡ **Rate Limiting**: Rate limiting awareness with proper error messages
+- 📚 **Documentation**: Complete documentation with examples and API reference
