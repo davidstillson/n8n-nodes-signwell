@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2024-07-23
+
+### Added
+- **Webhook Triggers** integrated into the main SignWell node
+  - Listen for real-time SignWell events (document created, sent, signed, completed, etc.)
+  - Automatic workflow triggering when document activities occur
+  - HMAC-SHA256 hash verification for security
+  - Event filtering to only process selected event types
+  - Unified interface - no separate trigger node needed
+- **Webhook Management** operations
+  - List all registered webhooks
+  - Create new webhook registrations
+  - Delete webhook registrations
+- Comprehensive webhook documentation and examples
+
+### Changed
+- Unified node design combining regular operations and webhook triggers
+- Enhanced node to support both transform and trigger modes
+- Updated documentation to reflect integrated webhook functionality
+
 ## [1.3.1] - 2024-07-23
 
 ### Changed

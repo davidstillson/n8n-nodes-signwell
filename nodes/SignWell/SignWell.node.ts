@@ -3,6 +3,7 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	IDataObject,
 	NodeConnectionType,
 } from 'n8n-workflow';
 
@@ -16,12 +17,20 @@ export class SignWell implements INodeType {
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Interact with SignWell API for documents and templates',
+		description: 'Interact with SignWell API for documents, templates, and webhook triggers',
 		defaults: {
 			name: 'SignWell',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
+		webhooks: [
+			{
+				name: 'default',
+				httpMethod: 'POST',
+				responseMode: 'onReceived',
+				path: 'webhook',
+			},
+		],
 		credentials: [
 			{
 				name: 'signWellApi',
@@ -44,6 +53,11 @@ export class SignWell implements INodeType {
 						name: 'Template',
 						value: 'template',
 						description: 'Work with SignWell templates',
+					},
+					{
+						name: 'Webhook',
+						value: 'webhook',
+						description: 'Manage SignWell webhooks',
 					},
 				],
 				default: 'document',
@@ -95,6 +109,8 @@ export class SignWell implements INodeType {
 				default: 'createFromTemplate',
 			},
 
+
+
 			// Template Operations
 			{
 				displayName: 'Operation',
@@ -133,6 +149,40 @@ export class SignWell implements INodeType {
 					},
 				],
 				default: 'get',
+			},
+
+			// Webhook Operations
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				displayOptions: {
+					show: {
+						resource: ['webhook'],
+					},
+				},
+				options: [
+					{
+						name: 'List',
+						value: 'list',
+						description: 'List all webhooks',
+						action: 'List webhooks',
+					},
+					{
+						name: 'Create',
+						value: 'create',
+						description: 'Create a new webhook',
+						action: 'Create a webhook',
+					},
+					{
+						name: 'Delete',
+						value: 'delete',
+						description: 'Delete a webhook',
+						action: 'Delete a webhook',
+					},
+				],
+				default: 'list',
 			},
 
 			// Document Parameters - Create From Template
@@ -350,6 +400,38 @@ export class SignWell implements INodeType {
 				description: 'Attachments that recipients must upload to complete the signing process. Shown after all document fields have been completed.',
 			},
 
+			// Webhook Parameters - Create
+			{
+				displayName: 'Webhook URL',
+				name: 'webhookUrl',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['webhook'],
+						operation: ['create'],
+					},
+				},
+				default: '',
+				description: 'The URL that SignWell will POST webhook events to',
+			},
+
+			// Webhook Parameters - Delete
+			{
+				displayName: 'Webhook ID',
+				name: 'webhookId',
+				type: 'string',
+				required: true,
+				displayOptions: {
+					show: {
+						resource: ['webhook'],
+						operation: ['delete'],
+					},
+				},
+				default: '',
+				description: 'The ID of the webhook to delete',
+			},
+
 			// Document Parameters - Get, Delete, Get Completed PDF, Send Reminder
 			{
 				displayName: 'Document ID',
@@ -496,6 +578,8 @@ export class SignWell implements INodeType {
 			},
 		],
 	};
+
+
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
@@ -705,6 +789,32 @@ export class SignWell implements INodeType {
 							this,
 							'DELETE',
 							`/document_templates/${templateId}`,
+						);
+					}
+				}
+
+				// Webhook operations
+				if (resource === 'webhook') {
+					if (operation === 'list') {
+						// List Webhooks operation
+						responseData = await signWellApiRequest.call(this, 'GET', '/hooks');
+					} else if (operation === 'create') {
+						// Create Webhook operation
+						const webhookUrl = this.getNodeParameter('webhookUrl', i) as string;
+
+						const body = {
+							url: webhookUrl,
+						};
+
+						responseData = await signWellApiRequest.call(this, 'POST', '/hooks', body);
+					} else if (operation === 'delete') {
+						// Delete Webhook operation
+						const webhookId = this.getNodeParameter('webhookId', i) as string;
+
+						responseData = await signWellApiRequest.call(
+							this,
+							'DELETE',
+							`/hooks/${webhookId}`,
 						);
 					}
 				}

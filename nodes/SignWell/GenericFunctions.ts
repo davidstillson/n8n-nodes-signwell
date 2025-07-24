@@ -1,14 +1,16 @@
 import {
 	IExecuteFunctions,
+	IHookFunctions,
 	ILoadOptionsFunctions,
 	IDataObject,
 	IHttpRequestMethods,
 	IRequestOptions,
+	JsonObject,
 	NodeApiError,
 } from 'n8n-workflow';
 
 export async function signWellApiRequest(
-	this: IExecuteFunctions | ILoadOptionsFunctions,
+	this: IExecuteFunctions | IHookFunctions | ILoadOptionsFunctions,
 	method: IHttpRequestMethods,
 	resource: string,
 	body: any = {},
@@ -40,7 +42,7 @@ export async function signWellApiRequest(
 		const response = await this.helpers.request(options);
 		return response;
 	} catch (error) {
-		throw new NodeApiError(this.getNode(), error as any);
+		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 
@@ -65,4 +67,40 @@ export async function signWellApiRequestAllItems(
 	} while (responseData[propertyName] && responseData[propertyName].length !== 0);
 
 	return returnData;
+}
+
+export async function signWellApiRequestHook(
+	this: IHookFunctions,
+	method: IHttpRequestMethods,
+	resource: string,
+	body: any = {},
+	qs: IDataObject = {},
+	uri?: string,
+	headers: IDataObject = {},
+): Promise<any> {
+	const credentials = await this.getCredentials('signWellApi');
+
+	const options: IRequestOptions = {
+		method,
+		body,
+		qs,
+		uri: uri || `${credentials.baseUrl}${resource}`,
+		headers: {
+			'X-Api-Key': credentials.apiKey,
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			...headers,
+		},
+		json: true,
+	};
+
+	try {
+		if (Object.keys(body as IDataObject).length === 0) {
+			delete options.body;
+		}
+
+		return await this.helpers.request(options);
+	} catch (error) {
+		throw new NodeApiError(this.getNode(), error as JsonObject);
+	}
 }

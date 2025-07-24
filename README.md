@@ -6,7 +6,13 @@ This is an n8n community node package that provides integration with the [SignWe
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## 🆕 What's New in v1.3.1
+## 🆕 What's New in v1.4.0
+
+### 🎣 **NEW: Webhook Triggers**
+Real-time event notifications for document activities! Get instant updates when:
+- 📄 **Documents** are created, sent, viewed, signed, or completed
+- 📋 **Templates** are created or encounter errors
+- ⚠️ **Issues** occur (declined, bounced, expired, canceled)
 
 ### ✨ Attachment Requests Support
 Request file uploads from recipients during the signing process! Perfect for:
@@ -21,6 +27,8 @@ Now supports **all major SignWell features**:
 - ✅ **Template Variables** - Dynamic text replacement
 - ✅ **Template Fields** - Pre-fill form fields
 - ✅ **Attachment Requests** - File upload requirements
+- ✅ **Webhook Triggers** - Real-time event notifications
+- ✅ **Webhook Management** - Create, list, and delete webhooks
 
 ## Installation
 
@@ -71,7 +79,11 @@ This package includes a **SignWell API** credential type. Configure it with:
 
 ### SignWell
 
-A unified node for interacting with the SignWell API, supporting both document and template operations.
+A unified node for interacting with the SignWell API, supporting:
+- **Document Operations** - Create, manage, and track documents
+- **Template Operations** - Create and manage document templates
+- **Webhook Management** - Create, list, and delete webhooks
+- **Webhook Triggers** - Listen for real-time SignWell events and automatically start workflows
 
 #### Resources
 
@@ -147,6 +159,41 @@ Interact with SignWell documents for electronic signing.
 - **Template Fields**: Used to pre-fill form fields in the document (e.g., setting values for date fields, text inputs, checkboxes, etc.)
 - **Attachment Requests**: Used to request file uploads from recipients during the signing process (e.g., driver's license, insurance certificates, etc.)
 
+##### Webhooks
+
+Manage SignWell webhooks and listen for real-time event notifications.
+
+**Operations:**
+- **Listen for Events**: Set up webhook trigger to listen for SignWell events (trigger mode)
+- **List**: List all registered webhooks
+- **Create**: Register a new webhook URL
+- **Delete**: Remove a webhook registration
+
+#### Webhook Events
+
+The SignWell node supports the following webhook events when in trigger mode:
+
+| Event | Description | When Triggered |
+|-------|-------------|----------------|
+| `document_created` | Document created | When a new document is created |
+| `document_sent` | Document sent | When a document is sent to recipients |
+| `document_viewed` | Document viewed | Each time a signer views the document |
+| `document_in_progress` | Document in progress | When signing has started (status: pending) |
+| `document_signed` | Document signed | Each time a recipient signs the document |
+| `document_completed` | Document completed | When all recipients have signed |
+| `document_expired` | Document expired | When a document has expired |
+| `document_canceled` | Document canceled | When sender cancels the document |
+| `document_declined` | Document declined | When a signer declines the document |
+| `document_bounced` | Email bounced | When email delivery fails |
+| `document_error` | Document error | When there's an error with the document |
+| `template_created` | Template created | When a new template is created |
+| `template_error` | Template error | When there's an error with a template |
+
+**Webhook Security:**
+- ✅ **Hash Verification**: Automatic HMAC-SHA256 signature verification
+- ✅ **Event Filtering**: Only process selected event types
+- ✅ **Secure Headers**: Proper authentication and content-type handling
+
 ##### Templates
 
 Manage SignWell document templates.
@@ -178,7 +225,36 @@ This package is designed to integrate with RV rental management systems. Here's 
 2. **Admin Approves Booking** → Triggers document creation
 3. **Create Document From Template** → Uses SignWell Documents node
 4. **Send for Signing** → Document automatically sent to customer
-5. **Monitor Completion** → Use webhooks to track signing status
+5. **Monitor Completion** → SignWell Trigger automatically detects completion
+
+### Webhook-Driven Automation Workflow
+
+With the new webhook trigger functionality, you can create fully automated workflows:
+
+1. **Document Created** → SignWell node (trigger mode) detects creation
+2. **Document Sent** → SignWell node (trigger mode) detects sending
+3. **Document Signed** → SignWell node (trigger mode) detects each signature
+4. **Document Completed** → SignWell node (trigger mode) starts completion workflow
+5. **Automatic Actions** → Update database, send notifications, generate invoices
+
+### Example: Document Completion Trigger
+
+```json
+{
+  "nodes": [
+    {
+      "name": "Document Completed Trigger",
+      "type": "n8n-nodes-signwell.signWell",
+      "parameters": {
+        "resource": "webhook",
+        "operation": "trigger",
+        "events": ["document_completed", "document_signed"],
+        "verifyHash": true
+      }
+    }
+  ]
+}
+```
 
 ### Example Workflow: Create Rental Agreement
 
@@ -254,6 +330,11 @@ This package implements the following SignWell API endpoints:
 - `PUT /document_templates/{id}` - Update template
 - `DELETE /document_templates/{id}` - Delete template
 
+### Webhooks
+- `GET /hooks` - List webhooks
+- `POST /hooks` - Create webhook
+- `DELETE /hooks/{id}` - Delete webhook
+
 ## Error Handling
 
 The nodes include comprehensive error handling:
@@ -298,6 +379,20 @@ Contributions are welcome! Please read the contributing guidelines and submit pu
 [MIT](LICENSE.md)
 
 ## Changelog
+
+### 1.4.0 - 2024-07-23
+- 🎣 **NEW FEATURE**: Added **Webhook Triggers** integrated into the main SignWell node
+  - Listen for real-time SignWell events (document created, sent, signed, completed, etc.)
+  - Automatic workflow triggering when document activities occur
+  - HMAC-SHA256 hash verification for security
+  - Event filtering to only process selected event types
+  - Unified interface - no separate trigger node needed
+- 🔧 **NEW FEATURE**: Added **Webhook Management** operations
+  - List all registered webhooks
+  - Create new webhook registrations
+  - Delete webhook registrations
+- 📚 **Documentation**: Comprehensive webhook documentation and examples
+- 🏗️ **Architecture**: Unified node design combining regular operations and webhook triggers
 
 ### 1.3.1 - 2024-07-23
 - 📚 **Documentation**: Comprehensive README and changelog updates
