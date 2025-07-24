@@ -134,30 +134,42 @@ export class SignWellTrigger implements INodeType {
 				const webhooks = await signWellApiRequestHook.call(this, 'GET', '/hooks');
 
 				for (const webhook of webhooks) {
-					if (webhook.url === webhookUrl) {
+					if (webhook.callback_url === webhookUrl) {
 						return true;
 					}
 				}
 				return false;
 			},
 			async create(this: IHookFunctions): Promise<boolean> {
-				const webhookUrl = this.getNodeWebhookUrl('default');
+				try {
+					const webhookUrl = this.getNodeWebhookUrl('default');
+					const events = this.getNodeParameter('events') as string[];
 
-				const body = {
-					url: webhookUrl,
-				};
+					// SignWell webhook creation body
+					const body = {
+						callback_url: webhookUrl, // SignWell API expects 'callback_url', not 'url'
+					};
 
-				const responseData = await signWellApiRequestHook.call(this, 'POST', '/hooks', body);
+					console.log('Creating SignWell webhook with:', JSON.stringify(body, null, 2));
 
-				if (responseData.id === undefined) {
-					// Required data is missing so was not successful
-					return false;
+					const responseData = await signWellApiRequestHook.call(this, 'POST', '/hooks', body);
+
+					console.log('SignWell webhook creation response:', JSON.stringify(responseData, null, 2));
+
+					if (responseData.id === undefined) {
+						console.error('SignWell webhook creation failed: No ID in response');
+						return false;
+					}
+
+					const webhookData = this.getWorkflowStaticData('node');
+					webhookData.webhookId = responseData.id as string;
+
+					console.log('SignWell webhook created successfully with ID:', responseData.id);
+					return true;
+				} catch (error) {
+					console.error('SignWell webhook creation error:', error);
+					throw error; // Re-throw to show the actual error to the user
 				}
-
-				const webhookData = this.getWorkflowStaticData('node');
-				webhookData.webhookId = responseData.id as string;
-
-				return true;
 			},
 			async delete(this: IHookFunctions): Promise<boolean> {
 				const webhookData = this.getWorkflowStaticData('node');

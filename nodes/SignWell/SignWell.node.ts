@@ -803,7 +803,7 @@ export class SignWell implements INodeType {
 						const webhookUrl = this.getNodeParameter('webhookUrl', i) as string;
 
 						const body = {
-							url: webhookUrl,
+							callback_url: webhookUrl,
 						};
 
 						responseData = await signWellApiRequest.call(this, 'POST', '/hooks', body);

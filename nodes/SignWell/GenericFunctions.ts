@@ -99,8 +99,28 @@ export async function signWellApiRequestHook(
 			delete options.body;
 		}
 
-		return await this.helpers.request(options);
-	} catch (error) {
+		console.log('SignWell API Request:', {
+			method,
+			url: options.uri,
+			body: options.body,
+			headers: options.headers
+		});
+
+		const response = await this.helpers.request(options);
+		console.log('SignWell API Response:', response);
+		return response;
+	} catch (error: any) {
+		console.error('SignWell API Error:', {
+			message: error.message,
+			status: error.response?.status,
+			statusText: error.response?.statusText,
+			data: error.response?.data,
+			config: {
+				method: error.config?.method,
+				url: error.config?.url,
+				data: error.config?.data
+			}
+		});
 		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
